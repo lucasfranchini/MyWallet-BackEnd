@@ -4,6 +4,7 @@ import cors from "cors";
 import { stripHtml } from "string-strip-html";
 import userSchema from "./Validations/userSchema.js";
 import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
 app.use(cors());
@@ -45,5 +46,31 @@ app.post('/sign-up', async (req,res)=>{
         res.sendStatus(500)
     }
 });
+
+app.post('/sign-in',async (req,res)=>{
+    try{
+        const { email, password } = req.body;
+        const validation = await connection.query(`
+            SELECT * 
+            FROM users
+            WHERE email=$1 
+        `,[email])
+        const user = validation.rows[0];
+    if(user && bcrypt.compareSync(password, user.password)) {
+        const token = uuidv4();
+        await connection.query(`
+          INSERT INTO sessions ("userId", token)
+          VALUES ($1, $2)
+        `, [user.id, token]);
+        res.send(token);
+    } else {
+        res.sendStatus(400);
+    }
+    }
+    catch (e){
+        console.log(e);
+        res.sendStatus(500)
+    }
+})
 
 app.listen(4000,()=>{console.log('Server is Running')})
