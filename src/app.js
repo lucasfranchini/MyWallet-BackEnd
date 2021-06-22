@@ -56,16 +56,16 @@ app.post('/sign-in',async (req,res)=>{
             WHERE email=$1 
         `,[email])
         const user = validation.rows[0];
-    if(user && bcrypt.compareSync(password, user.password)) {
-        const token = uuidv4();
-        await connection.query(`
-          INSERT INTO sessions ("userId", token)
-          VALUES ($1, $2)
-        `, [user.id, token]);
-        res.send(token);
-    } else {
-        res.sendStatus(400);
-    }
+        if(user && bcrypt.compareSync(password, user.password)) {
+            const token = uuidv4();
+            await connection.query(`
+            INSERT INTO sessions ("userId", token)
+            VALUES ($1, $2)
+            `, [user.id, token]);
+            res.send(token);
+        } else {
+            res.sendStatus(400);
+        }
     }
     catch (e){
         console.log(e);
