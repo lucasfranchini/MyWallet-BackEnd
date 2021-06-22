@@ -62,7 +62,10 @@ app.post('/sign-in',async (req,res)=>{
             INSERT INTO sessions ("userId", token)
             VALUES ($1, $2)
             `, [user.id, token]);
-            res.send(token);
+            res.send({
+                name:user.name,
+                token:token
+            });
         } else {
             res.sendStatus(400);
         }
