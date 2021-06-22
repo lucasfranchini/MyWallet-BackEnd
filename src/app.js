@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { stripHtml } from "string-strip-html";
 import userSchema from "./Validations/userSchema.js";
+import bcrypt from "bcrypt";
 
 const app = express();
 app.use(cors());
@@ -29,12 +30,13 @@ app.post('/sign-up', async (req,res)=>{
         if(!!validation.error){
             return res.sendStatus(400);
         }
-        
+
+        const hash = bcrypt.hashSync(newUser.password,12);
         await connection.query(`
             INSERT INTO users
             (name,email,password)
             VALUES ($1,$2,$3)
-        `)
+        `,[newUser.name,newUser.email,hash])
 
         res.sendStatus(201)
     }
