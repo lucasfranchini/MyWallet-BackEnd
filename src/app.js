@@ -2,6 +2,7 @@ import connection from "./connection.js";
 import express from "express";
 import cors from "cors";
 import { stripHtml } from "string-strip-html";
+import userSchema from "./Validations/userSchema.js";
 
 const app = express();
 app.use(cors());
@@ -15,15 +16,25 @@ app.post('/sign-up', async (req,res)=>{
             password: stripHtml(password).result.trim(),
             name: stripHtml(name).result.trim()
         }
-        const x = await connection.query(`
-        SELECT * 
-        FROM users
-        WHERE email= $1
+        const emailInUse = await connection.query(`
+            SELECT * 
+            FROM users
+            WHERE email= $1
         `,[newUser.email]);
-        if(x.rowCount > 0){
+        const validation = userSchema.validate(newUser);
+
+        if(emailInUse.rowCount > 0){
             return res.sendStatus(409)
         }
-        console.log(x.rows,x.rowCount)
+        if(!!validation.error){
+            return res.sendStatus(400);
+        }
+        
+        await connection.query(`
+            INSERT INTO users
+            (name,email,password)
+            VALUES ($1,$2,$3)
+        `)
 
         res.sendStatus(201)
     }
