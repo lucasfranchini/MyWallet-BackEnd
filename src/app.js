@@ -76,4 +76,30 @@ app.post('/sign-in',async (req,res)=>{
     }
 })
 
+app.get('/transactions',async (req,res)=>{
+    try{
+        const token = req.headers.authorization.replace('Bearer ', '');0
+        const transactions = await connection.query(`
+        SELECT transactions.* 
+        FROM transactions 
+        JOIN sessions 
+        ON transactions."userId"= sessions."userId" 
+        where token=$1
+        `,[token]);
+        if(transactions.rowCount===0){
+            const validation = await connection.query(`
+            SELECT *
+            FROM sessions
+            WHERE token=$1
+            `,[token]);
+            validation.rowCount === 0 ? res.sendStatus(404):res.send(transactions.rows);
+        }
+        res.send(transactions.rows)
+    }
+    catch (e){
+        console.log(e);
+        res.sendStatus(500)
+    }
+})
+
 app.listen(4000,()=>{console.log('Server is Running')})
