@@ -137,7 +137,13 @@ app.post('/transactions', async (req,res)=>{
 });
 
 app.post('/sign-out', async (req,res)=>{
-    
+    if(!req.headers.authorization) return sendStatus(401);
+    const token = req.headers.authorization.replace('Bearer ', '');
+    const result= await connection.query(`
+        DELETE FROM sessions
+        WHERE token=$1
+    `,[token]);
+    result.rowCount === 0 ? res.sendStatus(400):res.sendStatus(200)
 })
 
 app.listen(4000,()=>{console.log('Server is Running')})
