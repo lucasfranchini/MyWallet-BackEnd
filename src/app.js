@@ -5,6 +5,8 @@ import { stripHtml } from "string-strip-html";
 import userSchema from "./Validations/userSchema.js";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from "dayjs";
+import transactionSchema from "./Validations/transactionSchema.js";
 
 const app = express();
 app.use(cors());
@@ -78,7 +80,7 @@ app.post('/sign-in',async (req,res)=>{
 
 app.get('/transactions',async (req,res)=>{
     try{
-        const token = req.headers.authorization.replace('Bearer ', '');0
+        const token = req.headers.authorization.replace('Bearer ', '');
         const transactions = await connection.query(`
         SELECT transactions.* 
         FROM transactions 
@@ -92,14 +94,50 @@ app.get('/transactions',async (req,res)=>{
             FROM sessions
             WHERE token=$1
             `,[token]);
-            validation.rowCount === 0 ? res.sendStatus(404):res.send(transactions.rows);
+            return validation.rowCount === 0 ? res.sendStatus(401):res.send(transactions.rows);
         }
+        transactions.rows.forEach(r=>{
+            r.date=dayjs(r.date).format("DD/MM")
+        })
         res.send(transactions.rows)
     }
     catch (e){
         console.log(e);
         res.sendStatus(500)
     }
+})
+
+app.post('/transactions', async (req,res)=>{
+    try{
+        if(!req.headers.authorization) return sendStatus(401)
+        const token = req.headers.authorization.replace('Bearer ', '');
+        const validation = transactionSchema.validate(req.body)
+        if(validation.error){
+            return res.sendStatus(400)
+        }
+        const authorization = await connection.query(`
+            SELECT "userId" 
+            FROM sessions
+            WHERE token=$1
+        `,[token])
+        const id = authorization.rows[0].userId;
+        if(!id) return sendStatus(400)
+        const result = await connection.query(`
+            INSERT INTO transactions 
+            (date,value,type,"userId",name) 
+            VALUES (NOW(),$1,$2,$3,$4);
+        `,[req.body.value,req.body.type,id,req.body.description])
+        result.rowCount===0 ? res.sendStatus(400):res.sendStatus(200)
+        
+    }
+    catch (e){
+        console.log(e);
+        res.sendStatus(500)
+    }
+});
+
+app.post('/sign-out', async (req,res)=>{
+    
 })
 
 app.listen(4000,()=>{console.log('Server is Running')})
