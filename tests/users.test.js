@@ -65,6 +65,27 @@ describe("POST /sign-in", () => {
             "password": "456"
         }
         const result = await supertest(app).post('/sign-in').send(body)
-        expect(result.status).toEqual(200);
+        expect(result.body.name).toEqual('789');
+    });
+    it("returns status 400 for invalid passwords", async () => {
+        const body = {
+            "email": "123@teste.com",
+            "password": "4567"
+        }
+        const result = await supertest(app).post('/sign-in').send(body)
+        expect(result.status).toEqual(400);
+    });
+    it("returns status 400 for empty email", async () => {
+        const body = {
+            "email": "",
+            "password": "4567"
+        }
+        const result = await supertest(app).post('/sign-in').send(body)
+        expect(result.status).toEqual(400);
+    });
+    it("returns status 400 for empty params", async () => {
+        const body = {}
+        const result = await supertest(app).post('/sign-in').send(body)
+        expect(result.status).toEqual(400);
     });
 });
