@@ -78,7 +78,7 @@ describe("POST /sign-in", () => {
     it("returns status 400 for empty email", async () => {
         const body = {
             "email": "",
-            "password": "4567"
+            "password": "456"
         }
         const result = await supertest(app).post('/sign-in').send(body)
         expect(result.status).toEqual(400);
