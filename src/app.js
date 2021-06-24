@@ -16,9 +16,9 @@ app.post('/sign-up', async (req,res)=>{
     try{
         const {email,password,name} = req.body;
         const newUser = {
-            email: stripHtml(email).result.trim(),
-            password: stripHtml(password).result.trim(),
-            name: stripHtml(name).result.trim()
+            email: stripHtml(email? email:"").result.trim(),
+            password: stripHtml(password?password:"").result.trim(),
+            name: stripHtml(name?name:"").result.trim()
         }
         const emailInUse = await connection.query(`
             SELECT * 
