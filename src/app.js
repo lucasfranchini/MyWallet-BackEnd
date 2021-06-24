@@ -1,4 +1,4 @@
-import connection from "./connection.js";
+import connection from "./database.js";
 import express from "express";
 import cors from "cors";
 import { stripHtml } from "string-strip-html";
@@ -152,4 +152,4 @@ app.post('/sign-out', async (req,res)=>{
     }
 })
 
-app.listen(4000,()=>{console.log('Server is Running')})
+export default app;
