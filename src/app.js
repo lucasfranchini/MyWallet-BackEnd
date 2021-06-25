@@ -138,13 +138,15 @@ app.post('/transactions', async (req,res)=>{
 
 app.post('/sign-out', async (req,res)=>{
     try{
-        if(!req.headers.authorization) return sendStatus(401);
-    const token = req.headers.authorization.replace('Bearer ', '');
-    const result= await connection.query(`
-        DELETE FROM sessions
-        WHERE token=$1
-    `,[token]);
-    result.rowCount === 0 ? res.sendStatus(400):res.sendStatus(200)
+        if(!req.headers.authorization) {
+            return res.sendStatus(401);
+        }
+        const token = req.headers.authorization.replace('Bearer ', '');
+        const result= await connection.query(`
+            DELETE FROM sessions
+            WHERE token=$1
+        `,[token]);
+        result.rowCount === 0 ? res.sendStatus(400):res.sendStatus(200)
     }
     catch (e){
         console.log(e);

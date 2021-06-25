@@ -89,3 +89,30 @@ describe("POST /sign-in", () => {
         expect(result.status).toEqual(400);
     });
 });
+
+describe("POST /sign-out", () => {
+    let token;
+    beforeEach(async ()=>{
+        const body = {
+            "email": "123@teste.com",
+            "password": "456",
+            "name":"789"
+        }
+        await supertest(app).post('/sign-up').send(body);
+        const result = await supertest(app).post('/sign-in').send(body);
+        token = result.body.token;
+    })
+    it("returns status 200 for valid token", async () => {
+        const result = await supertest(app).post('/sign-out').set('Authorization',token);
+        expect(result.status).toEqual(200);
+    });
+    it("returns status 400 for invalid token", async () => {
+        const result = await supertest(app).post('/sign-out').set('Authorization',"token");
+        expect(result.status).toEqual(400);
+    });
+    it("returns status 401 for empty token", async () => {
+        const result = await supertest(app).post('/sign-out')
+        expect(result.status).toEqual(401);
+    });
+});
+
