@@ -4,7 +4,6 @@ import connection from "../src/database";
 
 beforeEach(async ()=>{
     await connection.query(`DELETE FROM users `)
-    await connection.query(`DELETE FROM sessions `)
 })
 
 afterAll(()=>{
