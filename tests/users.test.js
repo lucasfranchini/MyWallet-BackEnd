@@ -102,7 +102,7 @@ describe("POST /sign-out", () => {
         token = result.body.token;
     })
     it("returns status 200 for valid token", async () => {
-        const result = await supertest(app).post('/sign-out').set('Authorization',token);
+        const result = await supertest(app).post('/sign-out').set('Authorization',`Bearer ${token}`);
         expect(result.status).toEqual(200);
     });
     it("returns status 400 for invalid token", async () => {

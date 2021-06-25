@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 const transactionSchema = Joi.object({
-    value: Joi.number().required(),
+    value: Joi.number().integer(),
     description: Joi.string().required(),
     type: Joi.string().valid('income','expense')
 })

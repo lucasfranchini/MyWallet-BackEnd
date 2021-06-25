@@ -109,7 +109,7 @@ app.get('/transactions',async (req,res)=>{
 
 app.post('/transactions', async (req,res)=>{
     try{
-        if(!req.headers.authorization) return sendStatus(401)
+        if(!req.headers.authorization) return res.sendStatus(401)
         const token = req.headers.authorization.replace('Bearer ', '');
         const validation = transactionSchema.validate(req.body)
         if(validation.error){
@@ -121,13 +121,13 @@ app.post('/transactions', async (req,res)=>{
             WHERE token=$1
         `,[token])
         const id = authorization.rows[0].userId;
-        if(!id) return sendStatus(400)
-        const result = await connection.query(`
+        if(!id) return res.sendStatus(400)
+        await connection.query(`
             INSERT INTO transactions 
             (date,value,type,"userId",name) 
             VALUES (NOW(),$1,$2,$3,$4);
         `,[req.body.value,req.body.type,id,req.body.description])
-        result.rowCount===0 ? res.sendStatus(400):res.sendStatus(200)
+        res.sendStatus(201)
         
     }
     catch (e){
