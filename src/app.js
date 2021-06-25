@@ -80,7 +80,7 @@ app.post('/sign-in',async (req,res)=>{
 
 app.get('/transactions',async (req,res)=>{
     try{
-        const token = req.headers.authorization.replace('Bearer ', '');
+        const token = req.headers.authorization?.replace('Bearer ', '');
         const transactions = await connection.query(`
         SELECT transactions.* 
         FROM transactions 

@@ -23,7 +23,7 @@ afterAll(()=>{
 describe('POST /transactions',()=>{
     it('returns status 201 for valid params',async ()=>{
         const body ={
-            value: "3000",
+            value: 3000,
             description: "teste",
             type: "expense"
         }
@@ -32,9 +32,19 @@ describe('POST /transactions',()=>{
     });
     it('returns status 400 for invalid type',async ()=>{
         const body ={
-            value: "3000",
+            value: 3000,
             description: "teste",
             type: "outcome"
+        }
+        const result = await supertest(app).post('/transactions').set('Authorization', `Bearer ${token}`).send(body)
+        expect(result.status).toEqual(400);
+    });
+
+    it('returns status 400 for float value',async ()=>{
+        const body ={
+            value: 30.55,
+            description: "teste",
+            type: "income"
         }
         const result = await supertest(app).post('/transactions').set('Authorization', `Bearer ${token}`).send(body)
         expect(result.status).toEqual(400);
@@ -46,7 +56,7 @@ describe('POST /transactions',()=>{
     });
     it('returns status 401 for empty token',async ()=>{
         const body ={
-            value: "3000",
+            value: 3000,
             description: "teste",
             type: "outcome"
         }
@@ -55,9 +65,17 @@ describe('POST /transactions',()=>{
     });
 });
 
-/*describe('GET /transactions',()=>{
+describe('GET /transactions',()=>{
     it('returns an array for valid token',async ()=>{
-        const result = await supertest(app).get('/transactions').set('Authorization', `BEARER ${token}`)
+        const result = await supertest(app).get('/transactions').set('Authorization', `Bearer ${token}`)
+        expect(result.body.length).toBeGreaterThanOrEqual(0)
     });
-});*/
-
+    it('returns an array for empty token',async ()=>{
+        const result = await supertest(app).get('/transactions')
+        expect(result.status).toEqual(401);
+    });
+    it('returns an array for invalid token',async ()=>{
+        const result = await supertest(app).get('/transactions').set('Authorization', `Bearer token`)
+        expect(result.status).toEqual(401);
+    });
+});
