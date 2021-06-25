@@ -16,7 +16,10 @@ beforeAll(async ()=>{
     token = result.body.token;
 })
 
-afterAll(()=>{
+afterAll(async ()=>{
+    await connection.query(`DELETE FROM transactions`)
+    await connection.query(`DELETE FROM users`)
+    await connection.query(`DELETE FROM sessions`)
     connection.end();
 })
 
