@@ -1,5 +1,5 @@
-import "./setup";
-import app from "./app";
+import "./setup.js";
+import app from "./app.js";
 
 const port = Number(process.env.PORT);
 
