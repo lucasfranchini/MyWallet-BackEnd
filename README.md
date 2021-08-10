@@ -35,7 +35,8 @@ The following tools and frameworks were used in the construction of the project:
 1. Clone this repository
 2. create a postgres Database named mywallet
 3. copy database from dump.sql file
-4. Install dependencies
+4. create a .env with your database data and Port you wanna run your server
+5. Install dependencies
 
 ```bash
 npm i
